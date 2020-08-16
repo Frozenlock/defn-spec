@@ -41,6 +41,14 @@
               cljs
               clj))))
 
+#?(:clj (defmacro fdef
+          [& args]
+          `(? :clj
+              (clojure.spec.alpha/fdef ~@args)
+
+              :cljs
+              (cljs.spec.alpha/fdef ~@args))))
+
 #?(:clj
    (defn- defn-spec-form
      [args source]
@@ -57,18 +65,17 @@
            result-sym (gensym "result")]
        `(do (defn ~name
               ~@(when docstring [docstring])
-              ~@(when meta [meta])
+              ; Bug: cljs doesn't respect provided arglists https://clojure.atlassian.net/browse/CLJS-3277
+              ~(merge {:arglists `(quote ~(unform-to-arglists bs))} meta)
               [& ~args-sym]
               ~@(when args-spec [`(assert* :args '~qualified-name ~args-spec ~args-sym)])
               (let [~result-sym (apply (fn ~inner-fn-name ~@body) ~args-sym)]
-                ~@(when ret-spec [`(assert* :ret '~qualified-name (s/spec ~ret-spec) ~result-sym)])
+                ~@(when ret-spec [`(assert* :ret '~qualified-name ~ret-spec ~result-sym)])
                 ~result-sym))
 
-            (s/fdef ~name
+            (fdef ~name
               ~@(when args-spec [:args args-spec])
               ~@(when ret-spec [:ret ret-spec]))
-
-            (alter-meta! (var ~(symbol name)) merge {:arglists '~(unform-to-arglists bs)} ~source)
 
             (? :clj
                (var-get (var ~(symbol name)))
