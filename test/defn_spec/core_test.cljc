@@ -54,3 +54,12 @@
   (is (:doc (meta #'n-arity-fn)))
   (is-error-thrown #"did not conform to spec" (n-arity-fn 1 "2"))
   (is-error-thrown #"did not conform to spec" (n-arity-fn -1 0)))
+
+#?(:clj
+   (deftest disallowed-meta-keys
+     (let [e (try (eval '(defn-spec.core/defn-spec my-fn
+                           {:some-meta "data"}
+                           [x] x))
+                  (catch Exception e (.getCause e)))]
+       (is (= "Only 'args' and 'ret' are allowed in provided metadata" (.getMessage e)))
+       (is (= {:disallowed-keys '(:some-meta)} (ex-data e))))))

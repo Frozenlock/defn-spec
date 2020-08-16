@@ -53,6 +53,9 @@
    (defn- defn-spec-form
      [args source]
      (let [{:keys [name docstring meta bs]} (s/conform ::defn-args/defn-args args)
+           _ (let [disallowed-keys (seq (remove #{::args ::ret} (keys meta)))]
+               (when disallowed-keys (throw (ex-info "Only 'args' and 'ret' are allowed in provided metadata"
+                                                     {:disallowed-keys disallowed-keys}))))
            qualified-name (qualify-symbol name)
            args-spec (::args meta)
            ret-spec (::ret meta)
