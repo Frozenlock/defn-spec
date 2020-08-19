@@ -26,8 +26,6 @@
      [re expr]
      `(is-exception-thrown java.lang.Exception js/Error ~re ~expr)))
 
-(s/check-asserts true)
-
 (ds/defn-spec arity-1-fn
   {::ds/args (s/cat :x int?)
    ::ds/ret  nat-int?}
