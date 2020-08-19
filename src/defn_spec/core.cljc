@@ -73,7 +73,8 @@
               [& ~args-sym]
               ~@(when args-spec [`(assert* :args '~qualified-name ~args-spec ~args-sym)])
               (let [~result-sym (apply (fn ~inner-fn-name ~@body) ~args-sym)]
-                ~@(when ret-spec [`(assert* :ret '~qualified-name ~ret-spec ~result-sym)])
+                ; Wrap ret-spec in s/spec as it might not be a spec object (keyword, int?, etc.)
+                ~@(when ret-spec [`(assert* :ret '~qualified-name (s/spec ~ret-spec) ~result-sym)])
                 ~result-sym))
 
             (fdef ~name
