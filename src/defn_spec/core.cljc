@@ -1,6 +1,12 @@
 (ns defn-spec.core
-  (:require [clojure.spec.alpha :as s]
-            [defn-spec.defn-args :as defn-args]))
+  #?@
+  (:clj
+   [(:require [clojure.spec.alpha :as s]
+              [defn-spec.defn-args :as defn-args])]
+   :cljs
+   [(:require
+     [cljs.spec.alpha :as s]
+     [defn-spec.defn-args :as defn-args])]))
 
 (defn assert*
   [kind fn-name spec x]
@@ -49,6 +55,14 @@
               :cljs
               (cljs.spec.alpha/fdef ~@args))))
 
+#?(:clj (defmacro spec
+          [& args]
+          `(? :clj
+              (clojure.spec.alpha/spec ~@args)
+
+              :cljs
+              (cljs.spec.alpha/spec ~@args))))
+
 #?(:clj
    (defn- defn-spec-form
      [args source]
@@ -74,7 +88,7 @@
               ~@(when args-spec [`(assert* :args '~qualified-name ~args-spec ~args-sym)])
               (let [~result-sym (apply (fn ~inner-fn-name ~@body) ~args-sym)]
                 ; Wrap ret-spec in s/spec as it might not be a spec object (keyword, int?, etc.)
-                ~@(when ret-spec [`(assert* :ret '~qualified-name (s/spec ~ret-spec) ~result-sym)])
+                ~@(when ret-spec [`(assert* :ret '~qualified-name (spec ~ret-spec) ~result-sym)])
                 ~result-sym))
 
             (fdef ~name
