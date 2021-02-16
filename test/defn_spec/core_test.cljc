@@ -1,10 +1,16 @@
 (ns defn-spec.core-test
-  #?(:cljs (:require-macros [defn-spec.core-test :refer [is-error-thrown is-exception-thrown]]))
-  (:require
-    #?(:cljs [cljs.test :refer-macros [deftest is testing]]
-       :clj  [clojure.test :refer [deftest is testing]])
-    [clojure.spec.alpha :as s]
-    [defn-spec.core :as ds]))
+  #?@
+   (:clj
+    [(:require
+      [clojure.spec.alpha :as s]
+      [clojure.test :refer [deftest is testing]]
+      [defn-spec.core :as ds])]
+    :cljs
+    [(:require
+      [cljs.spec.alpha :as s]
+      [cljs.test :refer-macros [deftest is testing]]
+      [defn-spec.core :as ds])
+     (:require-macros [defn-spec.core-test :refer [is-error-thrown]])]))
 
 #?(:clj
    (defn- cljs-env?
