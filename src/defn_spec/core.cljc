@@ -6,7 +6,8 @@
    :cljs
    [(:require
      [cljs.spec.alpha :as s]
-     [defn-spec.defn-args :as defn-args])]))
+     [defn-spec.defn-args :as defn-args])
+    (:require-macros [defn-spec.core])]))
 
 (defn assert*
   [kind fn-name spec x]
